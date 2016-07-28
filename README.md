@@ -14,8 +14,9 @@ Recognizers:
     var express = require('express');
     var bodyParser = require('body-parser');
     var builder = require('botbuilder');
+    var botbuilderex = require('botbuilderex');
     
-    var FacebookConnector = require('../connectors/FacebookConnector');
+    var FacebookConnector = botbuilderex.connectors.FacebookConnector;
     var fb = new FacebookConnector({
         validation_token: process.env.validation_token,
         getPageInfo: function (page_id, cb) {
