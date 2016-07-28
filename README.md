@@ -10,16 +10,18 @@ Recognizers:
 
 
 ## Usage example:
-
+    
     var express = require('express');
     var bodyParser = require('body-parser');
     var builder = require('botbuilder');
-    var botbuilderex = require('botbuilderex');
     
-    var FacebookConnector = botbuilderex.connectors.FacebookConnector;
+    var FacebookConnector = require('../connectors/FacebookConnector');
     var fb = new FacebookConnector({
-        validation_token: << validation token >>,
-        page_access_token: << page access token >>
+        validation_token: process.env.validation_token,
+        getPageInfo: function (page_id, cb) {
+            // return the relevant page access token by the page_id
+            cb(null, { page_access_token: process.env.page_access_token });
+        }
     });
     
     var app = express();

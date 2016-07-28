@@ -9,7 +9,10 @@ var builder = require('botbuilder');
 var FacebookConnector = require('../connectors/FacebookConnector');
 var fb = new FacebookConnector({
     validation_token: process.env.validation_token,
-    page_access_token: process.env.page_access_token
+    getPageInfo: function (page_id, cb) {
+        // return the relevant page access token by the page_id
+        cb(null, { page_access_token: process.env.page_access_token });
+    }
 });
 
 var app = express();

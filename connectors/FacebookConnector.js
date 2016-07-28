@@ -7,7 +7,7 @@ const thumb_up_stickers = [369239383222810, 369239263222822, 369239343222814];
 var FacebookConnector = (function () {
     function FacebookConnector(settings) {
         this.validation_token = settings.validation_token;
-        this.page_access_token = settings.page_access_token;
+        this.getPageInfo = settings.getPageInfo;
         this.users = {};
     }
     FacebookConnector.prototype.getUserProfile = function (page_access_token, user_id, cb) {
@@ -17,11 +17,14 @@ var FacebookConnector = (function () {
         var fields = 'first_name,last_name,profile_pic,locale,timezone,gender';
         var url = 'https://graph.facebook.com/v2.6/' + user_id + '?fields=' + fields + '&access_token=' + page_access_token;
         var _this = this;
-        request(url, function (err, resp, body) {
-            if (body.error) { return cb('failed to fetch user profile'); }
+        request(url, function (err, resp) {
+            var body = JSON.parse(resp.body);
+            if (resp.statusCode != 200) {
+                return cb(body.error || 'error');
+            }
 
-            var user = JSON.parse(body);
-            user.id = user_id
+            var user = body;
+            user.id = user_id;
             _this.users[user_id] = user;
             cb(null, user);
         })
@@ -57,16 +60,28 @@ var FacebookConnector = (function () {
                 var sticker_id = event.message && event.message.sticker_id ? event.message.sticker_id : null;
                 if (thumb_up_stickers.indexOf(sticker_id) > -1) text = 'thumb up'
 
-                _this.getUserProfile(_this.page_access_token, user_id, function (err, user) {
+                var page = null;
+                async.waterfall([
+                    function (cb) {
+                        _this.getPageInfo(page_id, cb);
+                    },
+                    function (_page, cb) {
+                        page = _page;
+                        _this.getUserProfile(page.page_access_token, user_id, cb);
+                    },
+                    function (user) {
+                        // todo: take care of the other inputs as well
+
+                        var msg = new mb()
+                            .address({channelId: 'facebook', user: user, source: page, conversation: {id: user_id}})
+                            .timestamp()
+                            .text(text)
+                            .attachments(attachments);
+
+                        _this.handler(msg.toMessage());
+                    }
+                ], function (err) {
                     if (err) throw err;
-
-                    var msg = new mb()
-                        .address({channelId: 'facebook', user: user, page_id: page_id, conversation: {id: user_id}})
-                        .timestamp()
-                        .text(text)
-                        .attachments(attachments);
-
-                    _this.handler(msg.toMessage());
                 })
             }
         }
@@ -75,24 +90,28 @@ var FacebookConnector = (function () {
         this.handler = handler;
     };
     FacebookConnector.prototype.send = function (messages, done) {
-        var _this = this;
-        async.eachSeries(messages, function (msg, cb) {
-            if (msg.text) var message = { text: msg.text };
-            if (msg.attachment) var message = { attachment: msg.attachment };
-            if (!message) return cb('no message');
+        async.eachSeries(messages, this.postMessage, done);
+    }
+    FacebookConnector.prototype.postMessage = function (msg, cb) {
+        // todo: this needs to be aligned with the BotBuilder cards + FB specific transformation
 
-            request({
-                url: 'https://graph.facebook.com/v2.6/me/messages',
-                qs: {
-                    access_token: _this.page_access_token
-                },
-                method: "POST",
-                json: {
-                    recipient: {id: msg.address.user.id},
-                    message: message
-                }
-            })
-        }, done);
+        if (msg.text) var message = { text: msg.text };
+        if (msg.attachment) var message = { attachment: msg.attachment };
+        if (!message) return cb('no message');
+
+        var o = {
+            url: 'https://graph.facebook.com/v2.6/me/messages',
+            qs: {
+                access_token: msg.address.source.page_access_token
+            },
+            method: "POST",
+            json: {
+                recipient: {id: msg.address.user.id},
+                message: message
+            }
+        }
+
+        request(o, cb);
     }
     FacebookConnector.prototype.startConversation = function (address, cb) {
         cb('startConversation, not impl');

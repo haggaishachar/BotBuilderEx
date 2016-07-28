@@ -1,8 +1,8 @@
 {
   "name": "botbuilderex",
   "author": "Haggai Shachar",
-  "description": "The BotBuilderEx is a set of extensions for the [Microsoft BotBuilder Node SDK](https://github.com/Microsoft/BotBuilder/tree/master/Node)",
-  "version": "1.0.0",
+  "description": "The BotBuilderEx is a set of extensions for the Microsoft BotBuilder Node SDK",
+  "version": "1.0.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/haggaishachar/BotBuilderEx.git"
