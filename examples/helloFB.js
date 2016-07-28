@@ -6,15 +6,14 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var builder = require('botbuilder');
 
-var app = express();
-app.use(bodyParser.json());
-
 var FacebookConnector = require('../connectors/FacebookConnector');
 var fb = new FacebookConnector({
-    validation_token: "<< validation token >>",
-    page_access_token: "<< page access token >>"
+    validation_token: process.env.validation_token,
+    page_access_token: process.env.page_access_token
 });
 
+var app = express();
+app.use(bodyParser.json());
 app.get('/fb', fb.challenge());
 app.post('/fb', fb.listen());
 
@@ -39,7 +38,7 @@ bot.dialog('/', [
     }
 ]);
 
-var port = 3978
+var port = process.env.port || 3978;
 app.listen(port, function () {
     console.log('helloFB app is listening on port ' + port);
 });

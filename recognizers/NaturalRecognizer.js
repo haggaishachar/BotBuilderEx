@@ -2,13 +2,12 @@ var request = require('request');
 var natural = require('natural');
 
 var NaturalRecognizer = (function () {
-    function NaturalRecognizer(filename, stemmer) {
+    function NaturalRecognizer(filename, stemmer, threshold) {
         var _this = this;
-        if (filename) {
-            natural.LogisticRegressionClassifier.load(filename, stemmer, function (err, classifier) {
-                _this.classifier = classifier;
-            });
-        }
+        this.threshold = threshold || 0.8;
+        natural.LogisticRegressionClassifier.load(filename, stemmer, function (err, classifier) {
+            _this.classifier = classifier;
+        });
     }
     NaturalRecognizer.prototype.train = function (intents, output, cb) {
         var classifier = new natural.LogisticRegressionClassifier();
@@ -30,7 +29,7 @@ var NaturalRecognizer = (function () {
             var locale = context.message.textLocale || '*';
 
             var classifications = this.classifier.getClassifications(utterance);
-            if (classifications && classifications.length) {
+            if (classifications && classifications.length && classifications[0].value >= this.threshold) {
                 result.intent = classifications[0].label;
                 result.score = classifications[0].value;
             }

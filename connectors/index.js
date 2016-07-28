@@ -3,4 +3,3 @@
  */
 
 module.exports.FacebookConnector = require('./FacebookConnector');
-module.exports.LivePersonConnector = require('./LivePersonConnector');

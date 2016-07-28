@@ -56,7 +56,6 @@ var FacebookConnector = (function () {
                 var optin = event.optin;
                 var sticker_id = event.message && event.message.sticker_id ? event.message.sticker_id : null;
                 if (thumb_up_stickers.indexOf(sticker_id) > -1) text = 'thumb up'
-                console.log('incoming message - page_id:' + page_id + ' user_id:' + user_id + ' text:"' + text + '" postback:' + postback + ' optin:' + optin)
 
                 _this.getUserProfile(_this.page_access_token, user_id, function (err, user) {
                     if (err) throw err;

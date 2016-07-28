@@ -1,16 +1,16 @@
 {
-  "name": "BotBuilderEx",
-  "author": "LivePerson Inc.",
-  "description": "Bot Builder Ex is a set of extenions for the Microsoft BotBuilder framework",
+  "name": "botbuilderex",
+  "author": "Haggai Shachar",
+  "description": "The BotBuilderEx is a set of extensions for the [Microsoft BotBuilder Node SDK](https://github.com/Microsoft/BotBuilder/tree/master/Node)",
   "version": "1.0.0",
   "repository": {
     "type": "git",
-    "url": "https://lpgithub.dev.lprnd.net/labs/BotBuilderEx.git"
+    "url": "https://github.com/haggaishachar/BotBuilderEx.git"
   },
   "license": "MIT",
   "dependencies": {
-    "body-parser": "~1.15.1",
-    "express": "~4.13.4",
+    "body-parser": "1.15.2",
+    "express": "4.13.4",
     "botbuilder": "3.1.0",
     "natural": "0.4.0",
     "async": "2.0.1",
